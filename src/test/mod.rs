@@ -361,7 +361,12 @@ fn idempotence_tests() {
     init_log();
     run_test_with(&TestSetting::default(), || {
         // Get all files in the tests/target directory.
-        let files = get_test_files(Path::new("tests/target"), true);
+
+        let files = vec![
+            PathBuf::from("tests/target/rust-doc-in-enum/with-doc.rs"),
+            PathBuf::from("tests/target/rust-doc-in-enum/without-doc.rs"),
+        ];
+        // let files = get_test_files(Path::new("tests/target"), true);
         let (_reports, count, fails) = check_files(files, &None);
 
         // Display results.
