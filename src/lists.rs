@@ -285,7 +285,6 @@ where
     let indent_str = &formatting.shape.indent.to_string(formatting.config);
     while let Some((i, item)) = iter.next() {
         let item = item.as_ref();
-        dbg!(&item);
         let inner_item = item.item.as_ref().or_else(|err| Err(err.clone()))?;
         let first = i == 0;
         let last = iter.peek().is_none();

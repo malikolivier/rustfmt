@@ -31,7 +31,6 @@ impl<'b, T: Write + 'b> Session<'b, T> {
         input: Input,
         is_macro_def: bool,
     ) -> Result<FormatReport, ErrorKind> {
-        dbg!(&input);
         if !self.config.version_meets_requirement() {
             return Err(ErrorKind::VersionMismatch);
         }
