@@ -652,7 +652,7 @@ impl<'a> FmtVisitor<'a> {
         let has_single_line_variant = items.iter().any(|item| !item.inner_as_ref().contains('\n'));
         dbg!(has_multiline_variant);
         dbg!(has_single_line_variant);
-        if has_multiline_variant {
+        if has_multiline_variant && has_single_line_variant {
             // This branch isn't called for 'with-doc'. That's the problem I guess.
             items = itemize_list_with(0);
         }
