@@ -158,7 +158,9 @@ pub(crate) fn rewrite_with_alignment<T: AlignedItem>(
         }
     };
     let init_span = mk_sp(span.lo(), init_last_pos);
+    dbg!(one_line_width);
     let one_line_width = if rest.is_empty() { one_line_width } else { 0 };
+    dbg!(one_line_width);
 
     // if another group follows, we must force a separator
     let force_separator = !rest.is_empty();
@@ -171,6 +173,7 @@ pub(crate) fn rewrite_with_alignment<T: AlignedItem>(
         one_line_width,
         force_separator,
     )?;
+    dbg!(&result);
     if rest.is_empty() {
         Some(result + spaces)
     } else {
@@ -234,13 +237,20 @@ fn rewrite_aligned_items_inner<T: AlignedItem>(
         false,
     )
     .collect::<Vec<_>>();
+//     dbg!(&items);
+// items is the same in both cases. We need to look for another difference.
 
+    dbg!(one_line_width);
+    // if one_line_width == 35 { panic!("DIE") }
     let tactic = definitive_tactic(
         &items,
         ListTactic::HorizontalVertical,
         Separator::Comma,
         one_line_width,
     );
+    // tactic is different! Horizontal with doc, and Vertical without-doc.
+    dbg!(&tactic);
+    // Why is it becoming horizontal just because of a comment?
 
     if tactic == DefinitiveListTactic::Horizontal {
         // since the items fits on a line, there is no need to align them

@@ -233,10 +233,15 @@ where
     I: IntoIterator<Item = T> + Clone,
     T: AsRef<ListItem>,
 {
+    // width is 35 for with-doc and 0 for without-doc.
+    // We need width to be 0 for with-doc or else we will get a Horizontal tactic.
+    dbg!(width);
+    // tactic is always the same: HorizontalVertical
     let pre_line_comments = items
         .clone()
         .into_iter()
         .any(|item| item.as_ref().has_single_line_comment());
+    // pre_line_comments is always the same too: false
 
     let limit = match tactic {
         _ if pre_line_comments => return DefinitiveListTactic::Vertical,
@@ -245,14 +250,23 @@ where
         ListTactic::LimitedHorizontalVertical(limit) => ::std::cmp::min(width, limit),
         ListTactic::Mixed | ListTactic::HorizontalVertical => width,
     };
+    dbg!("GA?");
 
     let (sep_count, total_width) = calculate_width(items.clone());
     let total_sep_len = sep.len() * sep_count.saturating_sub(1);
     let real_total = total_width + total_sep_len;
 
-    if real_total <= limit && !items.into_iter().any(|item| item.as_ref().is_multiline()) {
+    dbg!(&real_total);
+    dbg!(&limit);
+    if dbg!(real_total <= limit) && !items.into_iter().any(|item| item.as_ref().is_multiline()) {
+        // With with-doc, we reach this branch.
+        // With with-doc `real_total(=8) <= limit (=35)` is true.
+        dbg!("Horizontal");
         DefinitiveListTactic::Horizontal
     } else {
+        dbg!("else");
+        // With without-doc `real_total(=8) <= limit (=0)` is false. That's expected.
+        // We want to be multiline all the time.
         match tactic {
             ListTactic::Mixed => DefinitiveListTactic::Mixed,
             _ => DefinitiveListTactic::Vertical,

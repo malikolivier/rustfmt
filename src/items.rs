@@ -617,6 +617,10 @@ impl<'a> FmtVisitor<'a> {
             .unwrap_or(&0);
 
         let itemize_list_with = |one_line_width: usize| {
+            dbg!(one_line_width);
+            // if one_line_width == 0{
+            //     panic!("DIE");
+            // }
             itemize_list(
                 self.snippet_provider,
                 enum_def.variants.iter(),
@@ -640,12 +644,16 @@ impl<'a> FmtVisitor<'a> {
             )
             .collect()
         };
+        dbg!(self.config.struct_variant_width());
         let mut items: Vec<_> = itemize_list_with(self.config.struct_variant_width());
 
         // If one of the variants use multiple lines, use multi-lined formatting for all variants.
         let has_multiline_variant = items.iter().any(|item| item.inner_as_ref().contains('\n'));
         let has_single_line_variant = items.iter().any(|item| !item.inner_as_ref().contains('\n'));
+        dbg!(has_multiline_variant);
+        dbg!(has_single_line_variant);
         if has_multiline_variant && has_single_line_variant {
+            // This branch isn't called for 'with-doc'. That's the problem I guess.
             items = itemize_list_with(0);
         }
 
@@ -668,6 +676,9 @@ impl<'a> FmtVisitor<'a> {
         one_line_width: usize,
         pad_discrim_ident_to: usize,
     ) -> Option<String> {
+        // one_line_width must be 0 when we have a comment!
+        // But we have 35 for some reason.
+        dbg!(one_line_width);
         if contains_skip(&field.attrs) {
             let lo = field.attrs[0].span.lo();
             let span = mk_sp(lo, field.span.hi());
@@ -1492,9 +1503,11 @@ pub(crate) fn format_struct_struct(
     }
 
     // 3 = ` ` and ` }`
+    dbg!(one_line_width);
     let one_line_budget = context.budget(result.len() + 3 + offset.width());
     let one_line_budget =
         one_line_width.map_or(0, |one_line_width| min(one_line_width, one_line_budget));
+    dbg!(one_line_budget);
 
     let items_str = rewrite_with_alignment(
         fields,
@@ -1503,6 +1516,7 @@ pub(crate) fn format_struct_struct(
         mk_sp(body_lo, span.hi()),
         one_line_budget,
     )?;
+    dbg!(&items_str);
 
     if !items_str.contains('\n')
         && !result.contains('\n')
