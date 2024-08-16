@@ -649,7 +649,24 @@ impl<'a> FmtVisitor<'a> {
 
         // If one of the variants use multiple lines, use multi-lined formatting for all variants.
         let has_multiline_variant = items.iter().any(|item| item.inner_as_ref().contains('\n'));
-        let has_single_line_variant = items.iter().any(|item| !item.inner_as_ref().contains('\n'));
+        let has_single_line_variant = items.iter().any(|item| {
+            let variant_str = item.inner_as_ref();
+            let mut first_line_is_read = false;
+            for line in variant_str.split('\n') {
+                if first_line_is_read {
+                    return false;
+                }
+
+                // skip rustdoc comments and macro attributes
+                if line.starts_with("///") || line.starts_with("#") {
+                    continue;
+                } else {
+                    first_line_is_read = true;
+                }
+            }
+
+            true
+        });
         dbg!(has_multiline_variant);
         dbg!(has_single_line_variant);
         dbg!(&items);
